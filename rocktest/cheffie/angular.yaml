@@ -1,0 +1,177 @@
+# Sample web scenario with RockTest
+# visits the sample Angular application "tour of heros" on Stackblitz
+
+- display: Opening link
+
+- step: web.get
+  desc: Opening StackBlitz
+  params:
+    url: https://angular.io/generated/live-examples/toh-pt6/stackblitz.html
+
+- step: display
+  value: Current window = ${$web.window()}
+
+
+# Click on the element with content "Open in New Window"
+# Wait 20 seconds for the element to be clickable
+# Wait is optional. By default, the timeout is 10 seconds.
+# If the click opens a new window, RockTest automatically switches to  it
+# unless the parameter "switch: false" is set.
+
+#- type: web.click
+#  params:
+#    by.linktext: Open in New Window
+#    wait : 20
+
+# You can decide not to switch automatically to the new window
+# Use the parameter switch = false
+# You need to switch explicitly after
+
+- display: Clicking [Open in a new window]
+
+- step: web.click
+  desc: Clicking [Open in a new window]
+  params:
+    by.xpath: ../..
+    from:
+      by.content : Open in New Window
+      wait : 60
+#    switch: false
+
+- step: display
+  value: New window = ${$web.newwindow()}
+
+#- step: web.switch
+#  desc: Switching to the new window
+#  params:
+#    window: ${$web.newwindow()}
+
+- display: Clicking the Heroes button
+
+- step: web.click
+  desc: Clicking the Heroes button
+  params:
+    by.linktext : Heroes
+    wait : 120
+
+# This click does not open a new window.
+
+- assert.equals:
+  desc: Check that no new window is open
+  params:
+    expected: unset
+    actual: ${$web.newwindow()::unset}
+
+- display: Verify the color of the Messages element
+
+# Get a CSS attribute
+
+- step: web.css
+  params:
+    by.content: Messages
+    name: color
+
+- assert.equals:
+  desc: Check get css property
+  params:
+    expected: rgb(168, 0, 0)
+    actual: ${css.result}
+
+- display: Send keys to the INPUT element
+
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: You can enter text in an input...
+
+- pause: 5
+
+# Select by tag name and clear
+- step: web.clear
+  desc: Clearing the INPUT element
+  params:
+    by.tag: input
+
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: ... and replace it by another text. Now I will add an entry.
+
+- pause: 5
+
+- step: web.clear
+  desc: Clearing the INPUT element
+  params:
+    by.tag: input
+
+# Select by tag name and send keys
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: Freddie Mercury
+
+- pause: 5
+
+- step: web.click
+  desc: Add entry
+  params:
+    by.content: Add hero
+
+- pause: 5
+
+# Select by tag name and clear
+- step: web.clear
+  desc: Clearing the INPUT element
+  params:
+    by.tag: input
+
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: I have added a new entry...
+
+- pause: 5
+
+
+- display: Clearing the INPUT element
+
+# Select by tag name and clear
+- step: web.clear
+  desc: Clearing the INPUT element
+  params:
+    by.tag: input
+
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: ... Now, I will delete the first entry (Dr Nice)
+
+- pause: 5
+
+- display: Deleting the first entry
+
+# Select by class name and click
+- step: web.click
+  desc: Deleting the first entry
+  params:
+    by.class: delete
+
+- step: web.clear
+  desc: Clearing the INPUT element
+  params:
+    by.tag: input
+
+- step: web.sendkeys
+  desc: Send keys to the INPUT element
+  params:
+    by.tag: input
+    value: As you can see the entry has disappeared.
+
+- step: pause
+  desc: Finished
+  value: 10

@@ -1,0 +1,248 @@
+- display: Run Mock
+
+# Create the datasource
+- step: call
+  value: ->connect
+
+# Init sequence
+- step: id.initseq
+  params:
+    value: 100
+
+- http.mock:
+  params:
+    port: 8080
+    headers:
+      content-type: application/json
+      Access-Control-Allow-Origin: "*"
+    when:
+      - uri: /api/heroes
+        method: options
+        response:
+          code: 200
+
+      - uri: /api/heroes
+        method: get
+        call:
+          value: ->getAll
+        response:
+          code: ${getAll.code}
+          body: ${getAll.body}
+
+      - uri: /api/heroes\?name=error
+        method: get
+        response:
+          code: 500
+
+      - uri: /api/heroes\?name=(.*)
+        method: get
+        call:
+          value: ->getByName
+          params:
+            name: ${1}
+        response:
+          code: ${getByName.code}
+          body: ${getByName.body}
+
+      - uri: /api/heroes/(.*)
+        method: get
+        call:
+          value: ->getById
+          params:
+            id: ${1}
+        response:
+          code: ${getById.code}
+          body: ${getById.body}
+
+      - uri: /api/heroes/(.*)
+        method: delete
+        call:
+          value: ->deleteById
+          params:
+            id: ${1}
+        response:
+          code: ${deleteById.code}
+
+      - uri: /api/heroes
+        method: post
+        call:
+          value: ->create
+          params:
+            body: ${body}
+        response:
+          code: ${create.code}
+          body: ${create.body}
+
+      - uri: /api/heroes
+        method: put
+        call:
+          value: ->update
+          params:
+            body: ${body}
+        response:
+          code: ${update.code}
+          body: ${update.body}
+
+- pause: forever
+
+
+- function: getAll
+
+  steps:
+  - display: Get All
+
+  - sql.request:
+    params:
+      request: select * from rock
+
+  - display: "Record found : ${request.0}"
+
+  - return: body = ${request.json}
+
+  - return: code = 200
+    # If no line is found, return 404, else 200
+
+
+
+# Function : get
+
+- function: getByName
+
+  steps:
+  - display: Look for Name=${name}
+
+  - sql.request:
+    params:
+      request: select * from rock where name='${name}'
+
+  - display: "Record found : ${request.0}"
+
+  - type: var
+    name: tmp
+    value: >-
+      [{
+        "id" : ${request.1},
+        "name" : "${request.2}"
+      }]
+
+  - display: ${request.0}
+
+    # If no line is found, return an empty body
+  - return: body = ${request.0?${tmp}::}
+
+  - return: code = ${request.0?200::404}
+    # If no line is found, return 404, else 200
+
+
+- function: getById
+
+  steps:
+  - display: Look for ID=${id}
+
+  - sql.request:
+    params:
+      request: select * from rock where id=${id}
+
+  - display: "Record found : ${request.0}"
+
+  - type: var
+    name: tmp
+    value: >-
+      [{
+        "id" : ${request.1},
+        "name" : "${request.2}"
+      }]
+
+  - display: ${request.0}
+
+    # If no line is found, return an empty body
+  - return: body = ${request.0?${tmp}::}
+
+  - return: code = ${request.0?200::404}
+    # If no line is found, return 404, else 200
+
+
+- function: deleteById
+
+  steps:
+  - display: Look for ID=${id}
+
+  - sql.request:
+    params:
+      request: delete from rock where id=${id}
+
+  - return: code = 200
+
+
+# Function : create
+
+- function: create
+
+  steps:
+    - display: Body ${body}
+
+    - var: id=${$id.seq()}
+
+    - sql.request:
+      params:
+        request: insert into rock (id,name) values(${id},'${$json.parse(${body}).name}');
+
+    - return: code = 201
+    - return: | 
+        body=[{
+          "id" : ${id},
+          "name" : "${$json.parse(${body}).name}"          
+        }] 
+
+# Function : update
+
+- function: update
+
+  steps:
+    - display: Body ${body}
+
+    - var: id=${$id.seq()}
+
+    - sql.request:
+      params:
+        request: update rock set name='${$json.parse(${body}).name}' where id=${$json.parse(${body}).id}
+
+    - return: code = 200
+    - return: body=${body}
+
+
+# Function to initialize the database
+
+- function : connect
+  steps:
+  - sql.connect:
+    params:
+      retry: 0
+      #url: "jdbc:h2:mem:"
+      url: "jdbc:mysql://localhost:3306/rocktest"
+      user: root
+      password: root
+  
+  - sql.request:
+    params:
+      request: drop table if exists rock;
+  - sql.request:
+    params:
+      request: >-
+        CREATE TABLE rock (
+           id INT NOT NULL,
+           name VARCHAR(50) NOT NULL
+        )
+  - sql.request:
+    params:
+      request: insert into rock (id,name) values(11,'Springsteen');
+  - sql.request:
+    params:
+      request: insert into rock (id,name) values(12,'DireStraits');
+  - sql.request:
+    params:
+      request: insert into rock (id,name) values(13,'INXS');
+  - sql.request:
+    params:
+      request: insert into rock (id,name) values(14,'JoeCoker');
+

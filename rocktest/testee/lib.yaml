@@ -1,0 +1,19 @@
+# Function to create a singer
+
+- function: createSingerInSQL
+  steps:
+    - var: id=${$id.seq()}
+    - sql.request:
+      params:
+        request: insert into rock (id,name) values(${id},'${name}');
+
+
+- function: checkSingerWithAPI
+  steps:
+  - step: http.get
+    params:
+      url: "http://localhost:8080/api/heroes?name=${name}"
+      expect:
+        code: 200
+        body.json:
+          "[0].name": "${name}"

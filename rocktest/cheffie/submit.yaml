@@ -1,0 +1,71 @@
+- web.get:
+  params:
+    url: https://www.google.com
+
+- web.switch:
+  desc: Switch to the iframe to accept the conditions
+  params:
+    frame:
+      by.css: "#cnsw>iframe"
+
+- step: skip
+######################################################
+# Other possible options:
+
+# Use the frame index 0
+- step: web.switch
+  params:
+    frame:
+      index: 0
+
+# Use a selector (equivalent to the CSS Selector)
+- step: web.switch
+  params:
+    frame:
+      by.tag: iframe
+      from:
+        by.id: cnsw
+
+# Use the iframe ID (if any. Not in the google page)
+- step: web.switch
+  params:
+    frame:
+      id: frameId
+
+# Use the iframe name (if any. Not in the google page)
+- step: web.switch
+  params:
+    frame:
+      name: frameName
+
+##################################################
+- step: resume
+
+
+- web.click:
+  params:
+    by.id : introAgreeButton
+
+- web.switch:
+  params:
+    default: 1
+
+- web.sendkeys:
+  params:
+    by.name: q
+    value: rocktest github
+
+- pause: 5
+
+- web.submit:
+  params:
+    by.name: q
+
+- pause: 5
+
+- web.click:
+  params:
+    by.linktext: rockintest/rocktest
+
+- pause: 5
+

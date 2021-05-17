@@ -1,0 +1,65 @@
+## Init database
+
+- sql.connect:
+  params:
+    retry: 0
+    #url: "jdbc:h2:mem:"
+    url: "jdbc:mysql://localhost:3306/rocktest"
+    user: root
+    password: root
+
+# Init sequence
+- step: id.initseq
+  params:
+    value: 200
+
+- sql.request:
+  params:
+    request: delete from rock
+
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(11,'Springsteen');
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(12,'DireStraits');
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(13,'INXS');
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(14,'JoeCoker');
+
+## Do the web part
+
+- web.get:
+  params:
+    url: http://localhost:4200/
+
+- pause: 1
+
+- web.sendkeys:
+  params:
+    by.id: inrocker 
+    value: New Rocker
+
+- pause: 1
+
+- web.click:
+  params:
+    by.tag: button
+    order: 1
+
+- pause: 5
+
+## Check in DB
+
+- sql.request:
+  params:
+    request: select count(*) from rock where name='New Rocker';
+
+- assert.equals:
+  params:
+    expected: 1
+    actual: ${request.0}
+

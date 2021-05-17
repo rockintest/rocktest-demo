@@ -1,0 +1,38 @@
+# Create the datasource
+- step: call
+  value: ->connect
+
+# Init sequence
+- step: id.initseq
+  params:
+    value: 20
+
+# Load data
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(${$id.seq()},"GunsNRoses");
+- sql.request:
+  params:
+    request: insert into rock (id,name) values(${$id.seq()},"ACDC");
+
+
+- step: http.get
+  params:
+    url: "http://localhost:8080/api/heroes?name=GunsNRoses"
+    expect:
+      code: 200
+      body.json:
+        "[0].name": "INXS"
+
+
+# Function to initialize the database
+
+- function : connect
+  steps:
+  - sql.connect:
+    params:
+      retry: 0
+      #url: "jdbc:h2:mem:"
+      url: "jdbc:mysql://localhost:3306/rocktest"
+      user: root
+      password: root
