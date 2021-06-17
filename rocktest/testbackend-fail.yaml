@@ -18,7 +18,7 @@
 
 - step: http.get
   params:
-    url: "http://localhost:8080/api/heroes?name=GunsNRoses"
+    url: "http://localhost:8080/api/heroes?name=ACDC"
     expect:
       code: 200
       body.json:

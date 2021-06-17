@@ -1,0 +1,63 @@
+- display: Run Gherkin test
+- gherkin:
+  params:
+    feature: newrocker.feature
+
+    given:
+      - expr: a username (.*)
+        steps:
+          - var: username=${gherkin.1}
+          - display: The username is ${username}
+      - expr: it does not exist
+        steps:
+          - display: Remove the rocker ${username} 
+          - sql.request:
+            params:
+              request: delete from rock where name = '${username}'
+
+    when:
+      - expr: I add this rocker
+        steps:
+          - display: I add the rocker ${username}
+          
+          - web.get:
+            params:
+              url: http://localhost:4200/
+
+          - pause: 1
+
+          - web.click:
+            params:
+              by.class: clear
+
+          - web.sendkeys:
+            params:
+              by.id: inrocker 
+              value: ${username}
+
+          - pause: 1
+
+          - web.click:
+            params:
+              by.tag: button
+              order: 1
+          
+    then:
+      - expr: I get a success
+        steps:
+          - web.text:
+            params:
+              by.content: succeeded
+          - display: ${text.value}
+
+      - expr: the rocker is actually created
+        steps:
+          - display: Read in the database that the rocker ${username} now exists
+          - sql.request:
+            params:
+              request: select count(*) from rock where name = '${username}'
+          - assert.equals:
+            params:
+              expected: 1
+              actual: ${request.1}
+
