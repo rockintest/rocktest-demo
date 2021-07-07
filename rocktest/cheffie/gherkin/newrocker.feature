@@ -2,7 +2,7 @@ Feature: Add a new user
 
   Scenario: Add a non existing rocker
 
-    Given a username newRocker
+    Given a username Scorpions
     And it does not exist
 
     When I add this rocker

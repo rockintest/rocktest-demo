@@ -1,6 +1,7 @@
 - web.get:
   params:
     url: https://www.google.com
+    browser: chrome
 
 - web.click:
   params:

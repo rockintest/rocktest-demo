@@ -1,6 +1,6 @@
 # Function to create a singer
 
-- function: createSingerInSQL
+- function: create singer in SQL
   steps:
     - var: id=${$id.seq()}
     - sql.request:
@@ -8,7 +8,7 @@
         request: insert into rock (id,name) values(${id},'${name}');
 
 
-- function: checkSingerWithAPI
+- function: check singer with API
   steps:
   - step: http.get
     params:

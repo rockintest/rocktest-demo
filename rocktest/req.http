@@ -1,0 +1,14 @@
+http://localhost:8080/api/heroes
+
+####
+
+POST http://localhost:8080/api/heroes
+content-type: application/json
+
+{
+    "name": "RollingStones"
+}
+
+####
+
+http://localhost:8080/api/heroes?name=GunsNRoses 

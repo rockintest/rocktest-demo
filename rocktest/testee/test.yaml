@@ -1,11 +1,9 @@
 - display: Simple test
 
-- step: call 
-  value: lib->createSingerInSQL
+- call: lib-> create singer in SQL
   params:
     name: Nirvana
 
-- step: call 
-  value: lib->checkSingerWithAPI
+- call: lib-> check singer with API
   params:
     name: Nirvana

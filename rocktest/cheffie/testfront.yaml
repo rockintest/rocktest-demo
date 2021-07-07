@@ -35,6 +35,7 @@
 - web.get:
   params:
     url: http://localhost:4200/
+    browser: chrome
 
 - pause: 1
 

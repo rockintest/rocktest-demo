@@ -7,6 +7,7 @@
   desc: Opening StackBlitz
   params:
     url: https://angular.io/generated/live-examples/toh-pt6/stackblitz.html
+    browser: chrome
 
 - step: display
   value: Current window = ${$web.window()}
@@ -74,7 +75,7 @@
 - assert.equals:
   desc: Check get css property
   params:
-    expected: rgb(168, 0, 0)
+    expected: rgba(168, 0, 0, 1)
     actual: ${css.result}
 
 - display: Send keys to the INPUT element
